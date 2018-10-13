@@ -329,8 +329,8 @@
 
 .module__indicator {
   position: absolute;
-  bottom: 7px;
-  left: 30%;
+  bottom: 3px;
+  left: 20px;
 
   display: block;
   width: 30%;
@@ -338,11 +338,7 @@
 
   background-color: #000000;
   border-radius: 2px;
-  opacity: 0.5;
-
-  @media (min-width: @tablet) {
-    display: none;
-  }
+  opacity: 0.8;
 }
 
 .module__cam-details {
@@ -351,9 +347,68 @@
 
   display: flex;
   justify-content: space-between;
-  margin-top: 3px;
+  margin-top: 10px;
 
   @media (min-width: @tablet) {
-    display: none;
+    .font-size(20);
+    .line-height(24);
+  }
+}
+
+.module--sensor {
+  .module__picture {
+    width: 100%;
+    height: auto;
+    min-height: 230px;
+    margin-top: 20px;
+
+    overflow: hidden;
+
+    border-radius: 20px;
+
+    @media (min-width: @mobile-l) {
+      min-height: 300px;
+    }
+
+    @media (min-width: @tablet) {
+      min-height: 450px;
+    }
+
+    @media (min-width: @desktop-s) {
+      min-height: 600px;
+    }
+
+    @media (min-width: @desktop) {
+      min-height: 800px;
+    }
+  }
+
+  .module__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 500px;
+    height: auto;
+
+    user-select: none;
+    touch-action: none;
+    user-drag: none;
+
+    @media (min-width: @mobile-l) {
+      width: 800px;
+    }
+
+    @media (min-width: @tablet) {
+      width: 1250px;
+    }
+
+    @media (min-width: @desktop-s) {
+      width: 1500px;
+    }
+
+    @media (min-width: @desktop) {
+      width: 2200px;
+    }
   }
 }
