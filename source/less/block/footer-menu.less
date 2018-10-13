@@ -1,0 +1,42 @@
+.footer-menu__list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+
+  @media (min-width: @tablet) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: 500px;
+  }
+}
+
+.footer-menu__item {
+  margin-bottom: 10px;
+
+  @media (min-width: @tablet) {
+    margin-right: 20px;
+    margin-bottom: 0;
+  }
+
+  &:last-child {
+    margin-right: 0;
+    margin-bottom: 0;
+  }
+}
+
+.footer-menu__link {
+  color: @text-light;
+  text-decoration: none;
+
+  &:hover,
+  &:focus {
+    opacity: 0.8;
+  }
+
+  &:active {
+    opacity: 1;
+  }
+}

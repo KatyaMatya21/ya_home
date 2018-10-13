@@ -1,0 +1,47 @@
+.container () {
+  max-width: 2000px;
+  margin: 0 auto;
+  padding-right: 20px;
+  padding-left: 20px;
+
+  @media (min-width: @tablet) {
+    padding-right: 30px;
+    padding-left: 30px;
+  }
+
+  @media (min-width: @desktop) {
+    padding-right: 40px;
+    padding-left: 40px;
+  }
+}
+
+.wrap () {
+  max-width: 100%;
+  margin: 0 auto;
+  padding-right: 20px;
+  padding-left: 20px;
+
+  @media (min-width: @tablet) {
+    max-width: 1100px;
+    padding-right: 30px;
+    padding-left: 30px;
+  }
+
+  @media (min-width: @desktop) {
+    max-width: 2000px;
+    padding-right: 40px;
+    padding-left: 40px;
+  }
+}
+
+.font-size(@font-size: @baseFontSize) {
+  @rem: (@font-size / @baseFontSize);
+  font-size: @font-size * 1px;
+  font-size: ~"@{rem}rem";
+}
+
+.line-height(@line-height: @baseFontSize) {
+  @rem: (@line-height / @baseFontSize);
+  line-height: @line-height * 1px;
+  line-height: ~"@{rem}rem";
+}
