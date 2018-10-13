@@ -8,5 +8,5 @@
 
 ### Доступные страницы
 
-`docs/index.html` - главная страница.
-`docs/sensor.html` – страница с видео.
+- `docs/index.html` - главная страница.
+- `docs/sensor.html` – страница с видео.
