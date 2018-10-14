@@ -1,7 +1,7 @@
 (function () {
 
   /**
-   * Video controller
+   * VideoController manages video vidgets
    * @constructor
    */
   function VideoController() {
@@ -9,7 +9,7 @@
   }
 
   /**
-   * Initialization
+   * Start initialization
    */
   VideoController.prototype.init = function () {
     var videos = document.querySelectorAll('.video');

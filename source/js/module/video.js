@@ -1,7 +1,7 @@
 (function () {
 
   /**
-   * Video
+   * Video represents single video block
    * @constructor
    */
   function Video(item) {
@@ -21,7 +21,7 @@
   }
 
   /**
-   * Initialization
+   * Start initialization
    */
   Video.prototype.init = function () {
     this.video = this.createVideo();
