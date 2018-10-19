@@ -15,7 +15,7 @@
 Предварительно запустить тестовые потоки для корректного отображения страницы `docs/video.html`:
 
 ```
-git clone https://github.com/mad-gooze/shri-2018-2-multimedia-homework.git
+git clone git@github.com:KatyaMatya21/shri-2018-2-multimedia-homework.git
 cd shri-2018-2-multimedia-homework
 npm i
 npm start
