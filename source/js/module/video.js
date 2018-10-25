@@ -48,7 +48,7 @@
    * @param url
    */
   Video.prototype.initVideo = function (video, url) {
-    if (Hls.isSupported()) {
+    if (window.Hsl && window.Hsl.isSupported()) {
       var hls = new Hls();
       hls.loadSource(url);
       hls.attachMedia(video);
@@ -217,7 +217,7 @@
    * Draw histogram
    */
   Video.prototype.drawSound = function () {
-    drawVisual = requestAnimationFrame(this.drawSound.bind(this));
+    requestAnimationFrame(this.drawSound.bind(this));
 
     this.analyser.getByteFrequencyData(this.dataArray);
 
