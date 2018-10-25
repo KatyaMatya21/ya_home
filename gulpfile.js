@@ -10,6 +10,8 @@ var imagemin = require('gulp-imagemin');
 var del = require('del');
 var gulpSequence = require('gulp-sequence');
 var prettify = require('gulp-html-prettify');
+var ts = require("gulp-typescript");
+var tsProject = ts.createProject("tsconfig.json");
 
 gulp.task('html', function () {
   return gulp.src('./source/*.html')
@@ -45,11 +47,13 @@ gulp.task('css', function () {
 });
 
 gulp.task('js', function () {
-  return gulp.src('./source/js/*.js')
+  return gulp.src('./source/ts/*.ts')
     .pipe(fileinclude({
       prefix: '@@',
       basepath: '@file'
     }))
+    .pipe(tsProject())
+    .js
     .pipe(sourcemaps.init())
     .pipe(gulp.dest('./docs/js'))
     .pipe(uglify())
