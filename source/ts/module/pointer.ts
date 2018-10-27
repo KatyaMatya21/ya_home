@@ -1,251 +1,266 @@
-var imageContainer = document.querySelector('.module__picture');
-var image = document.querySelector('.module__image');
-var imageIndicator = document.querySelector('.module__indicator');
-var imageScale = document.querySelector('.module__scale strong');
-var imageBrightness = document.querySelector('.module__light strong');
+export default function initPointers() {
 
-var imageWindow = imageContainer.offsetWidth;
-var imageWidth = image.offsetWidth;
-var imageIndicatorWidth = imageIndicator.offsetWidth;
+  const imageContainer: HTMLElement = document.querySelector('.module__picture');
+  const image: HTMLElement = document.querySelector('.module__image');
+  const imageIndicator: HTMLElement = document.querySelector('.module__indicator');
+  const imageScale: HTMLElement = document.querySelector('.module__scale strong');
+  const imageBrightness: HTMLElement = document.querySelector('.module__light strong');
 
-var pointerArray = [];
-var distancePrev = 0;
-var currentScale = 1;
-var currentBrightness = 100;
-var prevAngleChange = 0;
+  let imageWindow: number = imageContainer.offsetWidth;
+  let imageWidth: number = image.offsetWidth;
+  let imageIndicatorWidth: number = imageIndicator.offsetWidth;
 
-image.style.left = '0px';
-imageIndicator.style.left = '0px';
+  interface IPosition {
+    x: number;
+    y: number;
+  }
 
-image.style.transform = "scale(" + currentScale + ")";
+  interface IPointer {
+    id: number;
+    startPosition: IPosition;
+    currentPosition: IPosition;
+    prevPosition: IPosition;
+  }
 
-imageScale.innerHTML = currentScale * 100 + '%';
-imageBrightness.innerHTML = currentBrightness + '%';
-
-/**
- * Moves system to start position
- */
-var moveToStartPosition = function () {
-  imageWindow = imageContainer.offsetWidth;
-  imageWidth = image.offsetWidth;
-  imageIndicatorWidth = imageIndicator.offsetWidth;
+  const pointerArray: IPointer[] = [];
+  let distancePrev: number = 0;
+  let currentScale: number = 1;
+  let currentBrightness: number = 100;
+  let prevAngleChange: number = 0;
 
   image.style.left = '0px';
   imageIndicator.style.left = '0px';
 
-  image.style.transform = "scale(" + 1 + ")";
+  image.style.transform = "scale(" + currentScale + ")";
 
-  imageBrightness.innerHTML = '100%';
-  imageScale.innerHTML = '100%';
-};
+  imageScale.innerHTML = currentScale * 100 + '%';
+  imageBrightness.innerHTML = currentBrightness + '%';
 
-/**
- * Calculates distance
- * @param p1
- * @param p2
- * @returns {number}
- */
-var getDistance = function (p1, p2) {
-  return Math.sqrt(Math.pow((p2.x - p1.x), 2) + Math.pow((p2.y - p1.y), 2));
-};
+  /**
+   * Moves system to start position
+   */
+  const moveToStartPosition = function (): void {
+    imageWindow = imageContainer.offsetWidth;
+    imageWidth = image.offsetWidth;
+    imageIndicatorWidth = imageIndicator.offsetWidth;
 
-/**
- * Calculates angle
- * @param p1
- * @param p2
- * @returns {number}
- */
-var getAngle = function (p1, p2) {
-  return Math.atan2(p1.y - p2.y, p1.x - p2.x);
-};
+    image.style.left = '0px';
+    imageIndicator.style.left = '0px';
 
-/**
- * Moves picture
- * @param index
- */
-var onMove = function (index) {
-  var startX = pointerArray[index].prevPosition.x;
-  var x = event.x;
-  var dx = x - startX;
+    image.style.transform = "scale(" + 1 + ")";
 
-  var left = image.style.left.replace('px', '') * 1;
-  var leftIndicator = imageIndicator.style.left.replace('px', '') * 1;
+    imageBrightness.innerHTML = '100%';
+    imageScale.innerHTML = '100%';
+  };
 
-  var dleft = (imageWindow - imageIndicatorWidth) / (imageWidth - imageWindow);
+  /**
+   * Calculates distance
+   * @param p1
+   * @param p2
+   * @returns {number}
+   */
+  const getDistance = function (p1: IPosition, p2: IPosition) {
+    return Math.sqrt(Math.pow((p2.x - p1.x), 2) + Math.pow((p2.y - p1.y), 2));
+  };
 
-  dx > 0 ? left += Math.abs(dx) : left -= Math.abs(dx);
-  dx > 0 ? leftIndicator -= Math.abs(dx) * dleft : leftIndicator += Math.abs(dx) * dleft;
+  /**
+   * Calculates angle
+   * @param p1
+   * @param p2
+   * @returns {number}
+   */
+  const getAngle = function (p1: IPosition, p2: IPosition) {
+    return Math.atan2(p1.y - p2.y, p1.x - p2.x);
+  };
 
-  if (left > 0) {
-    left = 0;
-    leftIndicator = 0;
-  }
+  /**
+   * Moves picture
+   * @param index
+   * @param event
+   */
+  const onMove = function (index: number, event: PointerEvent) {
+    const startX: number = pointerArray[index].prevPosition.x;
+    const x: number = event.x;
+    const dx: number = x - startX;
 
-  if (left < imageWindow - imageWidth) {
-    left = imageWindow - imageWidth;
-    leftIndicator = imageWindow - imageIndicatorWidth;
-  }
+    let left: number = parseFloat(image.style.left.replace('px', ''));
+    let leftIndicator: number = parseFloat(imageIndicator.style.left.replace('px', ''));
 
-  image.style.left = left + 'px';
-  pointerArray[index].prevPosition.x = x;
+    const dleft: number = (imageWindow - imageIndicatorWidth) / (imageWidth - imageWindow);
 
-  imageIndicator.style.left = leftIndicator + 'px';
-};
+    dx > 0 ? left += Math.abs(dx) : left -= Math.abs(dx);
+    dx > 0 ? leftIndicator -= Math.abs(dx) * dleft : leftIndicator += Math.abs(dx) * dleft;
 
-/**
- * Pinches zoom
- */
-var onPinch = function () {
-
-  var pinchTreshold = 30;
-
-  var distance = getDistance(pointerArray[0].currentPosition, pointerArray[1].currentPosition);
-  var distanceStart = getDistance(pointerArray[0].startPosition, pointerArray[1].startPosition);
-
-  if (Math.abs(distance - distanceStart) < pinchTreshold) {
-    return;
-  }
-
-  if (distancePrev) {
-    var scale = 0.03;
-
-    if (distance > distancePrev) {
-      currentScale += scale;
-    } else {
-      currentScale -= scale;
-      if (currentScale <= 1) {
-        currentScale = 1;
-      }
+    if (left > 0) {
+      left = 0;
+      leftIndicator = 0;
     }
 
-    image.style.transform = "scale(" + currentScale + ")";
-    imageScale.innerHTML = Math.ceil(currentScale * 100) + '%';
-  }
+    if (left < imageWindow - imageWidth) {
+      left = imageWindow - imageWidth;
+      leftIndicator = imageWindow - imageIndicatorWidth;
+    }
 
-  distancePrev = distance;
-};
+    image.style.left = left + 'px';
+    pointerArray[index].prevPosition.x = x;
 
-/**
- * Rotates brightness
- */
-var onRotate = function () {
+    imageIndicator.style.left = leftIndicator + 'px';
+  };
 
-  var rotateTreshold = 0.5;
+  /**
+   * Pinches zoom
+   */
+  const onPinch = function () {
 
-  var startAngle = getAngle(pointerArray[0].startPosition, pointerArray[1].startPosition);
-  var currentAngle = getAngle(pointerArray[0].currentPosition, pointerArray[1].currentPosition);
-  var angleChange = (currentAngle - startAngle) * 180 / Math.PI;
+    const pinchTreshold: number = 30;
 
-  if (prevAngleChange) {
-    if (Math.abs(startAngle - currentAngle) < rotateTreshold) {
+    const distance: number = getDistance(pointerArray[0].currentPosition, pointerArray[1].currentPosition);
+    const distanceStart: number = getDistance(pointerArray[0].startPosition, pointerArray[1].startPosition);
+
+    if (Math.abs(distance - distanceStart) < pinchTreshold) {
       return;
     }
 
-    if (angleChange < 0) {
-      angleChange += 360;
+    if (distancePrev) {
+      const scale = 0.03;
+
+      if (distance > distancePrev) {
+        currentScale += scale;
+      } else {
+        currentScale -= scale;
+        if (currentScale <= 1) {
+          currentScale = 1;
+        }
+      }
+
+      image.style.transform = "scale(" + currentScale + ")";
+      imageScale.innerHTML = Math.ceil(currentScale * 100) + '%';
     }
 
-    if (prevAngleChange < angleChange) {
-      currentBrightness += 1;
+    distancePrev = distance;
+  };
+
+  /**
+   * Rotates brightness
+   */
+  const onRotate = function () {
+
+    const rotateTreshold = 0.5;
+
+    const startAngle: number = getAngle(pointerArray[0].startPosition, pointerArray[1].startPosition);
+    const currentAngle: number = getAngle(pointerArray[0].currentPosition, pointerArray[1].currentPosition);
+    let angleChange: number = (currentAngle - startAngle) * 180 / Math.PI;
+
+    if (prevAngleChange) {
+      if (Math.abs(startAngle - currentAngle) < rotateTreshold) {
+        return;
+      }
+
+      if (angleChange < 0) {
+        angleChange += 360;
+      }
+
+      if (prevAngleChange < angleChange) {
+        currentBrightness += 1;
+      } else {
+        currentBrightness -= 1;
+      }
+
+      if (currentBrightness > 100) {
+        currentBrightness = 100;
+      }
+
+      if (currentBrightness < 0) {
+        currentBrightness = 0;
+      }
+
+      image.style.filter = 'brightness(' + currentBrightness + '%)';
+      imageBrightness.innerHTML = Math.ceil(currentBrightness) + '%';
+
+    }
+
+    prevAngleChange = angleChange;
+
+  };
+
+  /**
+   * EventListener on window resize
+   */
+  window.addEventListener('resize', () => moveToStartPosition());
+
+  /**
+   * EventListener on pointerdown
+   */
+  imageContainer.addEventListener('pointerdown', function (event: PointerEvent): void {
+    imageContainer.setPointerCapture(event.pointerId);
+
+    pointerArray.push({
+      id: event.pointerId,
+      startPosition: {
+        x: event.x,
+        y: event.y,
+      },
+      prevPosition: {
+        x: event.x,
+        y: event.y,
+      },
+      currentPosition: {
+        x: event.x,
+        y: event.y,
+      },
+    });
+  });
+
+  /**
+   * EventListener on pointermove
+   */
+  imageContainer.addEventListener('pointermove', function (event: PointerEvent): void {
+    if (pointerArray.length === 0) {
+      return;
+    }
+
+    let index: number | null = null;
+    for (let i = 0; i < pointerArray.length; i++) {
+      if (pointerArray[i].id === event.pointerId) {
+        index = i;
+        break;
+      }
+    }
+
+    pointerArray[index].currentPosition.x = event.x;
+    pointerArray[index].currentPosition.y = event.y;
+
+    if (pointerArray.length > 1) {
+
+      onPinch();
+
+      onRotate();
+
     } else {
-      currentBrightness -= 1;
-    }
 
-    if (currentBrightness > 100) {
-      currentBrightness = 100;
-    }
+      onMove(index, event);
 
-    if (currentBrightness < 0) {
-      currentBrightness = 0;
-    }
-
-    image.style.filter = 'brightness(' + currentBrightness + '%)';
-    imageBrightness.innerHTML = Math.ceil(currentBrightness) + '%';
-
-  }
-
-  prevAngleChange = angleChange;
-
-};
-
-/**
- * EventListener on window resize
- */
-window.addEventListener('resize', function () {
-  moveToStartPosition();
-});
-
-/**
- * EventListener on pointerdown
- */
-imageContainer.addEventListener('pointerdown', function (event) {
-  imageContainer.setPointerCapture(event.pointerId);
-
-  pointerArray.push({
-    id: event.pointerId,
-    startPosition: {
-      x: event.x,
-      y: event.y
-    },
-    prevPosition: {
-      x: event.x,
-      y: event.y
-    },
-    currentPosition: {
-      x: event.x,
-      y: event.y
     }
   });
-});
 
-/**
- * EventListener on pointermove
- */
-imageContainer.addEventListener('pointermove', function (event) {
-  if (pointerArray.length === 0) {
-    return
-  }
+  /**
+   * EventListener on pointerup
+   */
+  imageContainer.addEventListener('pointerup', function (event): void {
+    let index = null;
 
-  var index = null;
-  for (var i = 0; i < pointerArray.length; i++) {
-    if (pointerArray[i].id === event.pointerId) {
-      index = i;
-      break;
+    for (let i = 0; i < pointerArray.length; i++) {
+      if (pointerArray[i].id === event.pointerId) {
+        index = i;
+      }
     }
-  }
 
-  pointerArray[index].currentPosition.x = event.x;
-  pointerArray[index].currentPosition.y = event.y;
+    pointerArray.splice(index, 1);
+  });
 
-  if (pointerArray.length > 1) {
+  /**
+   * EventListener on pointercancel
+   */
+  imageContainer.addEventListener('pointercancel', moveToStartPosition);
 
-    onPinch();
-
-    onRotate();
-
-  } else {
-
-    onMove(index);
-
-  }
-});
-
-/**
- * EventListener on pointerup
- */
-imageContainer.addEventListener('pointerup', function (event) {
-  var index = null;
-
-  for (var i = 0; i < pointerArray.length; i++) {
-    if (pointerArray[i].id === event.pointerId) {
-      index = i;
-    }
-  }
-
-  pointerArray.splice(pointerArray[index], 1);
-});
-
-/**
- * EventListener on pointercancel
- */
-imageContainer.addEventListener('pointercancel', moveToStartPosition);
+}

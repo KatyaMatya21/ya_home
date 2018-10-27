@@ -1,13 +1,16 @@
-var menu = document.querySelector('.header-menu');
-var buttonMenu = document.querySelector('.js-menu-button');
+export default function initMenus() {
+  const buttonMenu: HTMLElement | null = document.querySelector('.js-menu-button');
+  const menu: HTMLElement | null = document.querySelector('.header-menu');
+  const classString: string = 'header-menu--opened';
 
-/**
- * EventListener on click menu button
- */
-if (buttonMenu) {
-  buttonMenu.addEventListener('click', function () {
-    if (menu) {
-      menu.classList.toggle('header-menu--opened');
-    }
-  });
+  function toggleClass(element: HTMLElement, className: string): void {
+    element.classList.toggle(className);
+  }
+
+  if (buttonMenu && menu) {
+    /**
+     * EventListener on click menu button
+     */
+    buttonMenu.addEventListener('click', () => toggleClass(menu, classString));
+  }
 }

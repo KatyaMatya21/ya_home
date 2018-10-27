@@ -1,26 +1,25 @@
-(function () {
+import Video from './video';
+
+export default class VideoController {
 
   /**
    * VideoController manages video vidgets
    * @constructor
    */
-  function VideoController() {
+  constructor() {
     this.init();
   }
 
   /**
    * Start initialization
    */
-  VideoController.prototype.init = function () {
-    var videos = document.querySelectorAll('.video');
+  private init(): void {
+    const videos: NodeList = document.querySelectorAll('.video');
 
-    for (var k = 0; k < videos.length; k++) {
-      new Video(videos[k]);
+    for (let k = 0; k < videos.length; k++) {
+      // @ts-ignore
+      const vv: Video = new Video(videos[k]);
     }
-  };
+  }
 
-  window.VideoController = VideoController;
-
-}());
-
-new window.VideoController();
+}

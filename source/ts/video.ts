@@ -1,3 +1,5 @@
-@@include('module/menu.ts')
-@@include('module/video.ts')
-@@include('module/video-controller.ts')
+import initMenus from './module/menu';
+import VideoController from './module/video-controller';
+
+initMenus();
+const vc: VideoController = new VideoController();

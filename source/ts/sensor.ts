@@ -1,2 +1,5 @@
-@@include('module/menu.ts')
-@@include('module/pointer.ts')
+import initMenus from './module/menu';
+import initPointers from './module/pointer';
+
+initMenus();
+initPointers();

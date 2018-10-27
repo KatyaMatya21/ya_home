@@ -1,2 +1,5 @@
-@@include('module/menu.ts')
-@@include('module/module.ts')
+import initMenus from './module/menu';
+import initModules from './module/module';
+
+initMenus();
+initModules();

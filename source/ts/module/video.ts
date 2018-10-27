@@ -1,10 +1,23 @@
-(function () {
+/**
+ * Video represents single video block
+ * @constructor
+ */
+export default class Video {
+  private item: HTMLElement;
+  private video: HTMLVideoElement | null;
+  private canvas: HTMLCanvasElement | null;
+  private context: CanvasRenderingContext2D | null;
+  private canvasAudio: HTMLCanvasElement | null;
+  private contextAudio: CanvasRenderingContext2D | null;
+  private analyser: AnalyserNode | null;
+  private brightness: number;
+  private contrast: number;
+  private then: number;
 
-  /**
-   * Video represents single video block
-   * @constructor
-   */
-  function Video(item) {
+  private bufferLength: number;
+  private dataArray: Uint8Array;
+
+  constructor(item: HTMLElement) {
     this.item = item;
     this.video = null;
     this.canvas = null;
@@ -23,7 +36,7 @@
   /**
    * Start initialization
    */
-  Video.prototype.init = function () {
+  private init() {
     this.video = this.createVideo();
     this.initVideo(this.video, this.item.dataset.source);
 
@@ -33,71 +46,78 @@
     this.canvas.width = this.canvas.clientWidth;
     this.canvas.height = this.canvas.clientHeight;
 
-    this.item.querySelector('.video__player').addEventListener('click', this.show.bind(this));
-    this.item.querySelector('.video__control--brightness input').addEventListener('change', this.changeBrightness.bind(this));
-    this.item.querySelector('.video__control--contrast input').addEventListener('change', this.changeContrast.bind(this));
+    this.item.querySelector('.video__player')
+      .addEventListener('click', this.show.bind(this));
+    this.item.querySelector('.video__control--brightness input')
+      .addEventListener('change', this.changeBrightness.bind(this));
+    this.item.querySelector('.video__control--contrast input')
+      .addEventListener('change', this.changeContrast.bind(this));
 
     this.video.addEventListener('play', this.onPlay.bind(this));
 
     this.audioAnalyser();
-  };
+  }
 
   /**
    * Initialization video
-   * @param video
-   * @param url
+   * @param {HTMLVideoElement} video
+   * @param {string} url
    */
-  Video.prototype.initVideo = function (video, url) {
-    if (window.Hsl && window.Hsl.isSupported()) {
-      var hls = new Hls();
+  private initVideo(video: HTMLVideoElement, url: string): void {
+    // @ts-ignore
+    if (Hls.isSupported()) {
+      // @ts-ignore
+      const hls = new Hls();
       hls.loadSource(url);
       hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+      // @ts-ignore
+      hls.on(Hls.Events.MANIFEST_PARSED, function() {
         video.play();
       });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = 'https://video-dev.github.io/streams/x36xhzz/x36xhzz.m3u8';
-      video.addEventListener('loadedmetadata', function () {
+      video.addEventListener('loadedmetadata', function() {
         video.play();
       });
     }
-  };
+  }
 
   /**
    * Create video element
-   * @returns {HTMLElement}
+   * @returns {HTMLVideoElement}
    */
-  Video.prototype.createVideo = function () {
-    var video = document.createElement("video");
+  private createVideo(): HTMLVideoElement {
+    const video: HTMLVideoElement = document.createElement("video");
 
+    // @ts-ignore
     video.autoPlay = true;
     video.loop = true;
     video.muted = true;
     video.preload = 'auto';
 
     return video;
-  };
+  }
 
   /**
    * On play
    */
-  Video.prototype.onPlay = function () {
+  private onPlay(): void {
     this.then = Date.now();
-    requestAnimationFrame(this.drawVideo.bind(this), this.canvas);
-  };
+    requestAnimationFrame(this.drawVideo.bind(this));
+  }
 
   /**
    * Draw video
    */
-  Video.prototype.drawVideo = function () {
-    var self = this;
+  private drawVideo(): void {
+    const self: Video = this;
 
-    var fps = 24;
-    var interval = 1000 / fps;
-    var now = Date.now();
-    var delta = now - this.then;
+    const fps: number = 24;
+    const interval: number = 1000 / fps;
+    const now: number = Date.now();
+    const delta: number = now - this.then;
 
-    requestAnimationFrame(self.drawVideo.bind(self), self.canvas);
+    requestAnimationFrame(self.drawVideo.bind(self));
 
     if (!self.video.paused && !self.video.ended && delta > interval) {
 
@@ -106,33 +126,33 @@
       self.canvas.width = self.canvas.clientWidth;
       self.canvas.height = self.canvas.clientHeight;
 
-      var scale = Math.min(
+      const scale: number = Math.min(
         self.canvas.width / self.video.videoWidth,
         self.canvas.height / self.video.videoHeight) * 1.2;
 
-      var vidH = self.video.videoHeight;
-      var vidW = self.video.videoWidth;
-      var top = self.canvas.height / 2 - (vidH / 2) * scale;
-      var left = self.canvas.width / 2 - (vidW / 2) * scale;
+      const vidH: number = self.video.videoHeight;
+      const vidW: number = self.video.videoWidth;
+      const top: number = self.canvas.height / 2 - (vidH / 2) * scale;
+      const left: number = self.canvas.width / 2 - (vidW / 2) * scale;
 
       self.context.drawImage(self.video, left, top, vidW * scale, vidH * scale);
 
-      var imageData = self.context.getImageData(0, 0, self.canvas.width, self.canvas.height);
-      var data = imageData.data;
+      const imageData: ImageData = self.context.getImageData(0, 0, self.canvas.width, self.canvas.height);
+      const data: Uint8ClampedArray = imageData.data;
 
       self.applyBrightness(data, self.brightness);
-      self.applyContrast(data, parseInt(self.contrast, 10));
+      self.applyContrast(data, parseInt(self.contrast + '', 10));
 
       self.context.putImageData(imageData, 0, 0);
     }
-  };
+  }
 
   /**
    * Make sure the value stay between 0 and 255
-   * @param value
-   * @returns {*}
+   * @param {number} value
+   * @returns {number}
    */
-  Video.prototype.truncateColor = function (value) {
+  private truncateColor(value: number): number {
     if (value < 0) {
       value = 0;
     } else if (value > 255) {
@@ -140,60 +160,61 @@
     }
 
     return value;
-  };
+  }
 
   /**
    * Set brightness
-   * @param data
-   * @param brightness
+   * @param {Uint8ClampedArray} data
+   * @param {number} brightness
    */
-  Video.prototype.applyBrightness = function (data, brightness) {
-    for (var i = 0; i < data.length; i += 4) {
+  private applyBrightness(data: Uint8ClampedArray, brightness: number): void {
+    for (let i = 0; i < data.length; i += 4) {
       data[i] += 255 * (brightness / 100);
       data[i + 1] += 255 * (brightness / 100);
       data[i + 2] += 255 * (brightness / 100);
     }
-  };
+  }
 
   /**
    * Set contrast
-   * @param data
-   * @param contrast
+   * @param {Uint8ClampedArray} data
+   * @param {number} contrast
    */
-  Video.prototype.applyContrast = function (data, contrast) {
-    var factor = (259 * (contrast + 255)) / (255 * (259 - contrast));
+  private applyContrast(data: Uint8ClampedArray, contrast: number): void {
+    const factor: number = (259 * (contrast + 255)) / (255 * (259 - contrast));
 
-    for (var i = 0; i < data.length; i += 4) {
+    for (let i = 0; i < data.length; i += 4) {
       data[i] = this.truncateColor(factor * (data[i] - 128) + 128);
       data[i + 1] = this.truncateColor(factor * (data[i + 1] - 128) + 128);
       data[i + 2] = this.truncateColor(factor * (data[i + 2] - 128) + 128);
     }
-  };
+  }
 
   /**
    * Change brightness
-   * @param event
+   * @param {Event} event
    */
-  Video.prototype.changeBrightness = function (event) {
-    this.brightness = event.target.value;
-  };
+  private changeBrightness(event: Event): void {
+    this.brightness = parseFloat((event.target as HTMLInputElement).value);
+  }
 
   /**
    * Change contrast
-   * @param event
+   * @param {Event} event
    */
-  Video.prototype.changeContrast = function (event) {
-    this.contrast = event.target.value;
-  };
+  private changeContrast(event: Event): void {
+    this.contrast = parseFloat((event.target as HTMLInputElement).value);
+  }
 
   /**
    * Audio analyzer
    */
-  Video.prototype.audioAnalyser = function () {
-    var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  private audioAnalyser(): void {
+    // @ts-ignore
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     this.analyser = audioCtx.createAnalyser();
 
-    var source = audioCtx.createMediaElementSource(this.video);
+    const source: MediaElementAudioSourceNode = audioCtx.createMediaElementSource(this.video);
     source.connect(this.analyser);
 
     this.analyser.fftSize = 256;
@@ -211,23 +232,23 @@
     this.analyser.connect(audioCtx.destination);
 
     this.drawSound();
-  };
+  }
 
   /**
    * Draw histogram
    */
-  Video.prototype.drawSound = function () {
+  private drawSound(): void {
     requestAnimationFrame(this.drawSound.bind(this));
 
     this.analyser.getByteFrequencyData(this.dataArray);
 
     this.contextAudio.fillStyle = 'rgba(0, 0, 0, 0.1)';
     this.contextAudio.fillRect(0, 0, this.canvasAudio.clientWidth, this.canvasAudio.clientHeight);
-    var barWidth = (this.canvasAudio.clientWidth / this.bufferLength) * 2.5;
-    var barHeight;
-    var x = 0;
+    const barWidth: number = (this.canvasAudio.clientWidth / this.bufferLength) * 2.5;
+    let barHeight: number;
+    let x: number = 0;
 
-    for (var i = 0; i < this.bufferLength; i++) {
+    for (let i = 0; i < this.bufferLength; i++) {
       barHeight = this.dataArray[i] / 2;
 
       this.contextAudio.fillStyle = 'rgb(' + '50, 50, ' + (barHeight + 100) + ')';
@@ -235,14 +256,14 @@
 
       x += barWidth + 1;
     }
-  };
+  }
 
   /**
    * Open full video
-   * @param event
+   * @param {Event} event
    */
-  Video.prototype.show = function (event) {
-    var video = event.target.parentNode;
+  private show(event: Event): boolean | void {
+    const video: HTMLElement = (event.target as HTMLVideoElement).parentNode as HTMLElement;
     if (video.classList.contains('video--show')) {
       return false;
     }
@@ -252,24 +273,22 @@
     this.video.play();
 
     video.querySelector('.video__close').addEventListener('click', this.hide.bind(this));
-  };
+  }
 
   /**
    * Close full video
-   * @param event
+   * @param {Event} event
    */
-  Video.prototype.hide = function (event) {
-    var video = event.target.parentNode.parentNode;
+  private hide(event: Event): void {
+    const video: HTMLElement = (event.target as HTMLVideoElement).parentNode.parentNode as HTMLElement;
     video.classList.remove('video--show');
-    video.style = 'z-index: 666;';
+    video.style.zIndex = '666';
 
     this.video.muted = true;
 
-    setTimeout(function () {
-      video.style = '';
+    setTimeout(function() {
+      video.style.zIndex = '';
     }, 1000);
-  };
+  }
 
-  window.Video = Video;
-
-}());
+}
