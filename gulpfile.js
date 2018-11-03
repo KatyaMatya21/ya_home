@@ -10,6 +10,12 @@ var imagemin = require('gulp-imagemin');
 var del = require('del');
 var gulpSequence = require('gulp-sequence');
 var prettify = require('gulp-html-prettify');
+var browserify = require("browserify");
+var source = require('vinyl-source-stream');
+var tsify = require("tsify");
+var es = require('event-stream');
+var gf = require('gulp-flatten');
+var buffer = require('vinyl-buffer');
 
 gulp.task('html', function () {
   return gulp.src('./source/*.html')
@@ -45,17 +51,34 @@ gulp.task('css', function () {
 });
 
 gulp.task('js', function () {
-  return gulp.src('./source/js/*.js')
-    .pipe(fileinclude({
-      prefix: '@@',
-      basepath: '@file'
-    }))
-    .pipe(sourcemaps.init())
-    .pipe(gulp.dest('./docs/js'))
-    .pipe(uglify())
-    .pipe(rename({suffix: '.min'}))
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest('./docs/js'));
+
+  var files = [
+    './source/ts/script.ts',
+    './source/ts/sensor.ts',
+    './source/ts/video.ts'
+  ];
+
+  var tasks = files.map(function(entry) {
+    return browserify({
+      basedir: '.',
+      debug: true,
+      entries: [entry],
+      cache: {},
+      packageCache: {}
+    })
+      .plugin(tsify)
+      .bundle()
+      .pipe(source(entry))
+      .pipe(buffer())
+      .pipe(uglify())
+      .pipe(rename({extname: '.min.js'}))
+      .pipe(gf())
+      .pipe(gulp.dest("./docs/js"));
+  });
+
+  // create a merged stream
+  return es.merge.apply(null, tasks);
+
 });
 
 gulp.task('json', function () {
