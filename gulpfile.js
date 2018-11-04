@@ -55,7 +55,8 @@ gulp.task('js', function () {
   var files = [
     './source/ts/script.ts',
     './source/ts/sensor.ts',
-    './source/ts/video.ts'
+    './source/ts/video.ts',
+    './source/ts/home.ts'
   ];
 
   var tasks = files.map(function(entry) {
