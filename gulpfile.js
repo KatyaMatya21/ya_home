@@ -66,7 +66,7 @@ gulp.task('js', function () {
       cache: {},
       packageCache: {}
     })
-      .plugin(tsify)
+      .plugin(tsify, { global: true })
       .bundle()
       .pipe(source(entry))
       .pipe(buffer())
@@ -76,7 +76,6 @@ gulp.task('js', function () {
       .pipe(gulp.dest("./docs/js"));
   });
 
-  // create a merged stream
   return es.merge.apply(null, tasks);
 
 });
