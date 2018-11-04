@@ -6,12 +6,54 @@ import Store from './../../node_modules/fluppik/src/store';
 import EventsView from './views/events.view';
 import VideoView from './views/video.view';
 
+interface Idata {
+  events: Ievent[];
+}
+
+interface Ievent {
+  type: string;
+  title: string;
+  source: string;
+  time: string;
+  description: string;
+  icon: string;
+  data?: IeventData;
+  size: string;
+}
+
+interface IeventData {
+  type?: string;
+  temperature?: number;
+  humidity?: number;
+  albumcover?: string;
+  artist?: string;
+  track?: Itrack;
+  volume?: number;
+  buttons?: string[];
+}
+
+interface Itrack {
+  name: string;
+  length: string;
+}
+
 initMenus();
+
+let dataEvents: Idata;
+const xhr = new XMLHttpRequest();
+xhr.open('GET', '../events.json', false);
+xhr.send();
+if (xhr.status !== 200) {
+  alert(xhr.status + ': ' + xhr.statusText);
+} else {
+  dataEvents = JSON.parse(xhr.responseText).events;
+}
 
 // Инициализация Dispatcher и Store
 const dispatcher = new Dispatcher();
 const store = new Store({
   currentTab: 'events',
+  events: dataEvents,
 });
 
 store.connectDispatcher(dispatcher);
