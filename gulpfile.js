@@ -53,9 +53,7 @@ gulp.task('css', function () {
 gulp.task('js', function () {
 
   var files = [
-    './source/ts/script.ts',
     './source/ts/sensor.ts',
-    './source/ts/video.ts',
     './source/ts/home.ts'
   ];
 
@@ -102,7 +100,6 @@ gulp.task('images', function () {
 gulp.task('watch', function () {
   gulp.watch('source/**/*.html', ['html']);
   gulp.watch('source/less/**/*.less', ['css']);
-  //gulp.watch('source/js/**/*.js', ['js']);
   gulp.watch('source/ts/**/*.ts', ['js']);
   gulp.watch('source/images/*', ['images']);
   gulp.watch('source/fonts/*', ['fonts']);

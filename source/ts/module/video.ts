@@ -1,6 +1,5 @@
 /**
  * Video represents single video block
- * @constructor
  */
 export default class Video {
   private item: HTMLElement;
@@ -17,6 +16,8 @@ export default class Video {
   private bufferLength: number;
   private dataArray: Uint8Array;
 
+  private playListener: EventListener;
+
   constructor(item: HTMLElement) {
     this.item = item;
     this.video = null;
@@ -31,6 +32,14 @@ export default class Video {
     this.contrast = 0;
 
     this.init();
+  }
+
+  /**
+   * Destroys video
+   */
+  public destroy(): void {
+    this.video.pause();
+    this.video.removeEventListener('play', this.playListener);
   }
 
   /**
@@ -53,15 +62,14 @@ export default class Video {
     this.item.querySelector('.video__control--contrast input')
       .addEventListener('change', this.changeContrast.bind(this));
 
-    this.video.addEventListener('play', this.onPlay.bind(this));
+    this.playListener = this.onPlay.bind(this);
+    this.video.addEventListener('play', this.playListener);
 
     this.audioAnalyser();
   }
 
   /**
    * Initialization video
-   * @param {HTMLVideoElement} video
-   * @param {string} url
    */
   private initVideo(video: HTMLVideoElement, url: string): void {
     // @ts-ignore
@@ -84,7 +92,6 @@ export default class Video {
 
   /**
    * Create video element
-   * @returns {HTMLVideoElement}
    */
   private createVideo(): HTMLVideoElement {
     const video: HTMLVideoElement = document.createElement("video");
@@ -149,8 +156,6 @@ export default class Video {
 
   /**
    * Make sure the value stay between 0 and 255
-   * @param {number} value
-   * @returns {number}
    */
   private truncateColor(value: number): number {
     if (value < 0) {
@@ -164,8 +169,6 @@ export default class Video {
 
   /**
    * Set brightness
-   * @param {Uint8ClampedArray} data
-   * @param {number} brightness
    */
   private applyBrightness(data: Uint8ClampedArray, brightness: number): void {
     for (let i = 0; i < data.length; i += 4) {
@@ -177,8 +180,6 @@ export default class Video {
 
   /**
    * Set contrast
-   * @param {Uint8ClampedArray} data
-   * @param {number} contrast
    */
   private applyContrast(data: Uint8ClampedArray, contrast: number): void {
     const factor: number = (259 * (contrast + 255)) / (255 * (259 - contrast));
@@ -192,7 +193,6 @@ export default class Video {
 
   /**
    * Change brightness
-   * @param {Event} event
    */
   private changeBrightness(event: Event): void {
     this.brightness = parseFloat((event.target as HTMLInputElement).value);
@@ -200,7 +200,6 @@ export default class Video {
 
   /**
    * Change contrast
-   * @param {Event} event
    */
   private changeContrast(event: Event): void {
     this.contrast = parseFloat((event.target as HTMLInputElement).value);
@@ -260,7 +259,6 @@ export default class Video {
 
   /**
    * Open full video
-   * @param {Event} event
    */
   private show(event: Event): boolean | void {
     const video: HTMLElement = (event.target as HTMLVideoElement).parentNode as HTMLElement;
@@ -290,5 +288,4 @@ export default class Video {
       video.style.zIndex = '';
     }, 1000);
   }
-
 }

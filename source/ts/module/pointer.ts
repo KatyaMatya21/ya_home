@@ -55,9 +55,6 @@ export default function initPointers() {
 
   /**
    * Calculates distance
-   * @param p1
-   * @param p2
-   * @returns {number}
    */
   const getDistance = function (p1: IPosition, p2: IPosition) {
     return Math.sqrt(Math.pow((p2.x - p1.x), 2) + Math.pow((p2.y - p1.y), 2));
@@ -65,9 +62,6 @@ export default function initPointers() {
 
   /**
    * Calculates angle
-   * @param p1
-   * @param p2
-   * @returns {number}
    */
   const getAngle = function (p1: IPosition, p2: IPosition) {
     return Math.atan2(p1.y - p2.y, p1.x - p2.x);
@@ -75,8 +69,6 @@ export default function initPointers() {
 
   /**
    * Moves picture
-   * @param index
-   * @param event
    */
   const onMove = function (index: number, event: PointerEvent) {
     const startX: number = pointerArray[index].prevPosition.x;
@@ -262,5 +254,4 @@ export default function initPointers() {
    * EventListener on pointercancel
    */
   imageContainer.addEventListener('pointercancel', moveToStartPosition);
-
 }
