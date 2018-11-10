@@ -53,9 +53,8 @@ gulp.task('css', function () {
 gulp.task('js', function () {
 
   var files = [
-    './source/ts/script.ts',
     './source/ts/sensor.ts',
-    './source/ts/video.ts'
+    './source/ts/home.ts'
   ];
 
   var tasks = files.map(function(entry) {
@@ -66,7 +65,7 @@ gulp.task('js', function () {
       cache: {},
       packageCache: {}
     })
-      .plugin(tsify)
+      .plugin(tsify, { global: true })
       .bundle()
       .pipe(source(entry))
       .pipe(buffer())
@@ -76,7 +75,6 @@ gulp.task('js', function () {
       .pipe(gulp.dest("./docs/js"));
   });
 
-  // create a merged stream
   return es.merge.apply(null, tasks);
 
 });
@@ -102,7 +100,7 @@ gulp.task('images', function () {
 gulp.task('watch', function () {
   gulp.watch('source/**/*.html', ['html']);
   gulp.watch('source/less/**/*.less', ['css']);
-  gulp.watch('source/js/**/*.js', ['js']);
+  gulp.watch('source/ts/**/*.ts', ['js']);
   gulp.watch('source/images/*', ['images']);
   gulp.watch('source/fonts/*', ['fonts']);
 });

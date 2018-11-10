@@ -1,10 +1,11 @@
 {
   "name": "home",
-  "version": "0.0.1",
+  "version": "1.9.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node node_modules/eslint/bin/eslint.js source/js/module && node node_modules/stylelint/bin/stylelint.js 'source/less/block/*.less'"
+    "start": "gulp",
+    "test": "tslint source/ts/**/*.ts && node node_modules/stylelint/bin/stylelint.js 'source/less/block/*.less'"
   },
   "repository": {
     "type": "git",
@@ -37,5 +38,8 @@
     "typescript": "^3.1.3",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
+  },
+  "dependencies": {
+    "fluppik": "^1.0.4"
   }
 }
